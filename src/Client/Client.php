@@ -74,10 +74,7 @@ class Client implements ClientInterface
                 break;
             case CURLE_SSL_CACERT:
             case CURLE_SSL_PEER_CERTIFICATE:
-                $msg = "Could not verify Stripe's SSL certificate.  Please make sure "
-                    . 'that your network is not intercepting certificates.  '
-                    . "(Try going to $url in your browser.)  "
-                    . 'If this problem persists,';
+                $msg = "Could not verify AWS SSL certificate";
                 break;
             case 0:
             default:
