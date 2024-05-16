@@ -9,8 +9,7 @@
 
 namespace kamerk22\AmazonGiftCode\Client;
 
-
-use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Arr;
 use kamerk22\AmazonGiftCode\Exceptions\AmazonErrors;
 
 class Client implements ClientInterface
@@ -30,9 +29,9 @@ class Client implements ClientInterface
         $handle = curl_init($url);
         curl_setopt($handle, CURLOPT_POST, true);
         curl_setopt($handle, CURLOPT_HTTPHEADER, $headers);
-//        curl_setopt($handle, CURLOPT_FAILONERROR, true);
         curl_setopt($handle, CURLOPT_POSTFIELDS, $params);
         curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+
         $result = curl_exec($handle);
 
         if ($result === false) {
@@ -41,13 +40,27 @@ class Client implements ClientInterface
             $this->handleCurlError($url, $err, $message);
         }
 
-        if (curl_getinfo($handle, CURLINFO_HTTP_CODE) !== JsonResponse::HTTP_OK) {
+        $httpCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
+
+        if ($httpCode !== 200) {
             $err = curl_errno($handle);
-            $message = json_decode($result)->message;
+            $message = $this->getResponseError($result, $httpCode);
             throw AmazonErrors::getError($message, $err);
         }
+
         return $result;
 
+    }
+
+    private function getResponseError(string $response, int $httpCode): string
+    {
+        $decoded = json_decode($response, true);
+
+        if ($decoded && array_key_exists('message', $decoded)) {
+            return $decoded['message'] . '(HTTP ' . $httpCode . ')';
+        }
+
+        return 'Unexpected HTTP code: ' . $httpCode . ' with response: ' . $response;
     }
 
     private function handleCurlError($url, $errno, $message): void
