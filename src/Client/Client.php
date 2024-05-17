@@ -54,14 +54,10 @@ class Client implements ClientInterface
 
     private function getResponseError(string $response, int $httpCode): string
     {
-        try {
-            $decoded = json_decode($response, true);
+        $decoded = json_decode($response, true);
 
-            if ($decoded && array_key_exists('message', $decoded)) {
-                return 'AWS error: ' . $decoded['message'] . '(HTTP ' . $httpCode . ')';
-            }
-        } catch(Throwable $exception) {
-            // Swallow and return simpler error below
+        if ($decoded && array_key_exists('message', $decoded)) {
+            return 'AWS error: ' . $decoded['message'] . '(HTTP ' . $httpCode . ')';
         }
 
         return 'Unexpected HTTP code: ' . $httpCode . ' with response: ' . $response;
