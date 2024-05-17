@@ -9,8 +9,8 @@
 
 namespace kamerk22\AmazonGiftCode\Client;
 
-use Illuminate\Support\Arr;
 use kamerk22\AmazonGiftCode\Exceptions\AmazonErrors;
+use Throwable;
 
 class Client implements ClientInterface
 {
@@ -54,10 +54,14 @@ class Client implements ClientInterface
 
     private function getResponseError(string $response, int $httpCode): string
     {
-        $decoded = json_decode($response, true);
+        try {
+            $decoded = json_decode($response, true);
 
-        if ($decoded && array_key_exists('message', $decoded)) {
-            return $decoded['message'] . '(HTTP ' . $httpCode . ')';
+            if ($decoded && array_key_exists('message', $decoded)) {
+                return 'AWS error: ' . $decoded['message'] . '(HTTP ' . $httpCode . ')';
+            }
+        } catch(Throwable $exception) {
+            // Swallow and return simpler error below
         }
 
         return 'Unexpected HTTP code: ' . $httpCode . ' with response: ' . $response;
