@@ -53,10 +53,10 @@ class AWS
      *
      * @throws AmazonErrors
      */
-    public function getCode($amount, $creationId = null): CreateResponse
+    public function getCode($amount, $creationId = null, $programId = null): CreateResponse
     {
         $serviceOperation = self::CREATE_GIFT_CARD_SERVICE;
-        $payload = $this->getGiftCardPayload($amount, $creationId);
+        $payload = $this->getGiftCardPayload($amount, $creationId, $programId);
         $canonicalRequest = $this->getCanonicalRequest($serviceOperation, $payload);
         $dateTimeString = $this->getTimestamp();
         $result = json_decode($this->makeRequest($payload, $canonicalRequest, $serviceOperation, $dateTimeString), true);
@@ -249,12 +249,13 @@ class AWS
      * @param $creationId
      * @return string
      */
-    public function getGiftCardPayload($amount, $creationId = null): string
+    public function getGiftCardPayload($amount, $creationId = null, $programId = null): string
     {
         $amount = trim($amount);
         $payload = [
             'creationRequestId' => $creationId ?: uniqid($this->_config->getPartner().'_'),
             'partnerId' => $this->_config->getPartner(),
+            ...($programId !== null ? ['programID' => $programId] : []),
             'value' =>
                 [
                     'currencyCode' => $this->_config->getCurrency(),
