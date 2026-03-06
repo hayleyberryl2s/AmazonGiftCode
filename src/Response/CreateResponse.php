@@ -50,7 +50,7 @@ class CreateResponse
     /**
      * Amazon Gift Card status
      *
-     * @var string
+     * @var bool|string
      */
     protected $_status;
     /**
@@ -79,7 +79,7 @@ class CreateResponse
     public function __construct($jsonResponse)
     {
         $this->_raw_json = $jsonResponse;
-        $this->_status = TRUE;
+        $this->_status = true;
         $this->parseJsonResponse($jsonResponse);
     }
 
@@ -126,9 +126,9 @@ class CreateResponse
     }
 
     /**
-     * @return string
+     * @return bool|string
      */
-    public function getStatus(): string
+    public function getStatus(): bool|string
     {
         return $this->_status;
     }
@@ -176,16 +176,18 @@ class CreateResponse
         if (array_key_exists('gcClaimCode', $jsonResponse)) {
             $this->_claim_code = $jsonResponse['gcClaimCode'];
         }
-        if (array_key_exists('amount', $jsonResponse['cardInfo']['value'])) {
-            $this->_value = $jsonResponse['cardInfo']['value']['amount'];
-        }
-        if (array_key_exists('currencyCode', $jsonResponse['cardInfo']['value'])) {
-            $this->_currency = $jsonResponse['cardInfo']['value']['currencyCode'];
+        if (array_key_exists('cardInfo', $jsonResponse) && array_key_exists('value', $jsonResponse['cardInfo'])) {
+            if (array_key_exists('amount', $jsonResponse['cardInfo']['value'])) {
+                $this->_value = $jsonResponse['cardInfo']['value']['amount'];
+            }
+            if (array_key_exists('currencyCode', $jsonResponse['cardInfo']['value'])) {
+                $this->_currency = $jsonResponse['cardInfo']['value']['currencyCode'];
+            }
         }
         if (array_key_exists('gcExpirationDate', $jsonResponse)) {
             $this->_expiration_date = $jsonResponse['gcExpirationDate'];
         }
-        if (array_key_exists('cardStatus', $jsonResponse['cardInfo'])) {
+        if (array_key_exists('cardInfo', $jsonResponse) && array_key_exists('cardStatus', $jsonResponse['cardInfo'])) {
             $this->_card_status = $jsonResponse['cardInfo']['cardStatus'];
         }
 

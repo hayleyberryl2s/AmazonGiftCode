@@ -10,8 +10,6 @@
 namespace kamerk22\AmazonGiftCode\Response;
 
 
-use Illuminate\Support\Facades\Log;
-
 class CreateBalanceResponse
 {
     /**
@@ -29,7 +27,7 @@ class CreateBalanceResponse
     /**
      * Amazon Gift Card Balance Status
      *
-     * @var string
+     * @var bool|string
      */
     protected $_status;
     /**
@@ -52,7 +50,7 @@ class CreateBalanceResponse
     public function __construct($jsonResponse)
     {
         $this->_raw_json = $jsonResponse;
-        $this->_status = TRUE;
+        $this->_status = 'success';
         $this->parseJsonResponse($jsonResponse);
     }
 
@@ -73,9 +71,9 @@ class CreateBalanceResponse
     }
 
     /**
-     * @return string
+     * @return bool|string
      */
-    public function getStatus(): string
+    public function getStatus(): bool|string
     {
         return $this->_status;
     }
@@ -105,11 +103,13 @@ class CreateBalanceResponse
         if (!is_array($jsonResponse)) {
             throw new \RuntimeException('Response must be a scalar value');
         }
-        if (array_key_exists('amount', $jsonResponse['availableFunds'])) {
-            $this->_amount = $jsonResponse['availableFunds']['amount'];
-        }
-        if (array_key_exists('currencyCode', $jsonResponse['availableFunds'])) {
-            $this->_currency = $jsonResponse['availableFunds']['currencyCode'];
+        if (array_key_exists('availableFunds', $jsonResponse)) {
+            if (array_key_exists('amount', $jsonResponse['availableFunds'])) {
+                $this->_amount = $jsonResponse['availableFunds']['amount'];
+            }
+            if (array_key_exists('currencyCode', $jsonResponse['availableFunds'])) {
+                $this->_currency = $jsonResponse['availableFunds']['currencyCode'];
+            }
         }
         if (array_key_exists('status', $jsonResponse)) {
             $this->_status = $jsonResponse['status'];

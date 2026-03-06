@@ -30,7 +30,7 @@ class CancelResponse
     /**
      * Amazon Gift Card status
      *
-     * @var string
+     * @var bool|string
      */
     protected $_status;
 
@@ -48,7 +48,7 @@ class CancelResponse
     public function __construct($jsonResponse)
     {
         $this->_raw_json = $jsonResponse;
-        $this->_status = TRUE;
+        $this->_status = true;
         $this->parseJsonResponse($jsonResponse);
     }
 
@@ -71,9 +71,9 @@ class CancelResponse
 
 
     /**
-     * @return string
+     * @return bool|string
      */
-    public function getStatus(): string
+    public function getStatus(): bool|string
     {
         return $this->_status;
     }
