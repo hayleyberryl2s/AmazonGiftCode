@@ -33,7 +33,7 @@ class AmazonGiftCode
      *
      * @throws AmazonErrors
      */
-    public function buyGiftCard(float|int $value, ?string $creationRequestId = null, ?string $programId): Response\CreateResponse
+    public function buyGiftCard(float|int $value, ?string $creationRequestId = null, ?string $programId = null): Response\CreateResponse
     {
         return (new AWS($this->_config))->getCode($value, $creationRequestId, $programId);
     }
